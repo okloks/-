@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>記錄日記</title>
+    <title>LifeSync</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="生活筆記">
+    <meta name="apple-mobile-web-app-title" content="LifeSync">
     <link rel="apple-touch-icon" href="logo.png">
 
     <style>
         :root {
             --primary-color: #4f46e5;
             --primary-hover: #4338ca;
-            --bg-color: #f9fafb;
+            --bg-color: #f3f4f6;
             --card-bg: #ffffff;
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --border-color: #e5e7eb;
             --success-bg: #f0fdf4;
             --success-border: #4ade80;
+            --danger-color: #ef4444;
         }
 
         * {
@@ -31,7 +32,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             line-height: 1.5;
@@ -48,186 +49,125 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             padding: 8px 4px;
         }
 
-        header img {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-        }
-
-        header h1 {
-            font-size: 20px;
-            font-weight: 700;
-        }
+        header img { width: 40px; height: 40px; object-fit: contain; }
+        header h1 { font-size: 20px; font-weight: 700; }
 
         /* 儀表板 */
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .stat-card {
             background: var(--card-bg);
             padding: 16px;
             border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
             border: 1px solid var(--border-color);
         }
+        .stat-label { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-value { font-size: 22px; font-weight: 800; color: var(--text-main); }
 
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        /* 輸入區塊 */
+        /* 輸入區塊與快捷標籤 */
         .input-section {
             background: var(--card-bg);
             padding: 16px;
             border-radius: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
             border: 1px solid var(--border-color);
             margin-bottom: 24px;
         }
 
-        .input-group {
-            display: flex;
-            gap: 8px;
-        }
+        .input-group { display: flex; gap: 8px; margin-bottom: 12px; }
 
         textarea {
-            flex: 1;
-            height: 46px;
-            padding: 11px 16px;
+            flex: 1; height: 46px; padding: 11px 16px;
             border: 1px solid var(--border-color);
-            border-radius: 24px;
-            font-size: 15px;
-            resize: none;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: inherit;
+            border-radius: 24px; font-size: 15px; resize: none; outline: none;
+            transition: border-color 0.2s; background: #f9fafb;
         }
+        textarea:focus { border-color: var(--primary-color); background: #fff; }
 
-        textarea:focus {
-            border-color: var(--primary-color);
+        button.main-btn {
+            background: var(--primary-color); color: white; border: none;
+            border-radius: 24px; padding: 0 20px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
         }
+        button.main-btn:active { transform: scale(0.95); }
+        button.main-btn:disabled { background: #a5b4fc; cursor: not-allowed; }
 
-        button {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 24px;
-            padding: 0 20px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        /* 快捷標籤系統 (Quick Chips) */
+        .quick-chips {
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
+            scrollbar-width: none;
         }
-
-        button:hover {
-            background: var(--primary-hover);
+        .quick-chips::-webkit-scrollbar { display: none; }
+        
+        .chip {
+            background: #e0e7ff; color: var(--primary-hover);
+            border: none; border-radius: 16px; padding: 6px 12px;
+            font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
+            transition: 0.2s;
         }
+        .chip:hover { background: #c7d2fe; }
 
-        button:disabled {
-            background: #a5b4fc;
-            cursor: not-allowed;
-        }
-
-        /* 列表區塊 */
+        /* 列表區塊與現代化勾選框 */
         .list-section {
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
+            background: var(--card-bg); border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid var(--border-color); overflow: hidden;
         }
 
         .list-header {
-            padding: 16px;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 16px; font-weight: 600; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center; background: #fafafa;
         }
 
         .record-item {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            gap: 12px;
-            transition: background-color 0.2s;
+            display: flex; align-items: center; padding: 16px;
+            border-bottom: 1px solid var(--border-color); gap: 14px; transition: 0.3s;
+            position: relative;
         }
-
-        .record-item:last-child {
-            border-bottom: none;
-        }
-
-        /* 【新樣式】當項目有卡路里紀錄時，自動以淺綠色與左邊框提示 */
-        .record-item.has-calories {
-            background-color: var(--success-bg);
-            border-left: 4px solid var(--success-border);
-        }
+        .record-item:last-child { border-bottom: none; }
+        
+        .record-item.has-calories { background-color: var(--success-bg); border-left: 4px solid var(--success-border); }
 
         .record-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-            border: 2px solid var(--border-color);
-            cursor: pointer;
-            accent-color: var(--primary-color);
+            appearance: none; -webkit-appearance: none;
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid #cbd5e1; cursor: pointer; position: relative; transition: all 0.2s;
+            flex-shrink: 0;
         }
-
-        .record-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .record-item input[type="checkbox"]:checked {
+            background-color: #10b981; border-color: #10b981;
         }
-
-        .record-text {
-            font-size: 15px;
-            font-weight: 500;
+        .record-item input[type="checkbox"]:checked::after {
+            content: '✓'; color: white; position: absolute; font-weight: bold;
+            top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 14px;
         }
+        .record-item input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .record-meta {
-            font-size: 12px;
-            color: var(--text-muted);
-            display: flex;
-            gap: 12px;
-        }
-
-        .record-status {
-            font-size: 13px;
-            font-weight: 600;
-        }
-
+        .record-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .record-text { font-size: 16px; font-weight: 600; }
+        .record-meta { font-size: 13px; color: var(--text-muted); display: flex; gap: 12px; }
+        
+        .record-status { font-size: 13px; font-weight: 600; min-width: 45px; text-align: right; }
         .status-pending { color: #f59e0b; }
         .status-syncing { color: #3b82f6; }
         .status-success { color: #10b981; }
-        .status-failed { color: #ef4444; }
 
-        /* 載入中動畫 */
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 12px;
-            color: var(--text-muted);
-            font-size: 14px;
+        .delete-btn {
+            background: none; border: none; font-size: 16px; color: #cbd5e1;
+            cursor: pointer; padding: 4px; transition: 0.2s;
         }
+        .delete-btn:hover { color: var(--danger-color); transform: scale(1.1); }
+
+        .loading-spinner { display: none; text-align: center; padding: 12px; color: var(--text-muted); font-size: 14px; }
     </style>
 </head>
 <body>
@@ -235,45 +175,57 @@
 <div class="container">
     <header>
         <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
-        <h1>記錄日記</h1>
+        <h1>LifeSync</h1>
     </header>
 
     <div class="dashboard">
         <div class="stat-card">
-            <div class="stat-label">今日總開銷</div>
+            <div class="stat-label">今日開銷</div>
             <div class="stat-value" id="total-expenses">$0</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">今日總卡路里</div>
+            <div class="stat-label">攝取熱量</div>
             <div class="stat-value" id="total-calories">0 kcal</div>
         </div>
     </div>
 
     <div class="input-section">
         <div class="input-group">
-            <textarea id="note-input" placeholder="輸入內容，例如：叉燒飯 55 或 跑步 30分鐘..."></textarea>
-            <button id="send-btn" onclick="processNote()">分析</button>
+            <textarea id="note-input" placeholder="輸入內容，例如：叉燒飯 55..."></textarea>
+            <button id="send-btn" class="main-btn" onclick="processNote()">分析</button>
         </div>
-        <div id="loading-text" class="loading-spinner">AI 正在智慧解析中...</div>
+        
+        <div class="quick-chips">
+            <button class="chip" onclick="fillInput('☕ 咖啡 45')">+ 咖啡</button>
+            <button class="chip" onclick="fillInput('🍱 便當 60')">+ 便當</button>
+            <button class="chip" onclick="fillInput('🏃‍♂️ HIIT 30分鐘')">+ HIIT</button>
+            <button class="chip" onclick="fillInput('🧗‍♂️ 抱石攀岩')">+ 攀岩</button>
+        </div>
+
+        <div id="loading-text" class="loading-spinner">✨ AI 正在智慧解析中...</div>
     </div>
 
     <div class="list-section">
         <div class="list-header">
-            <span>今日動態紀錄</span>
-            <span style="font-size: 12px; color: var(--text-muted);">需手動勾選同步</span>
+            <span>待處理清單</span>
+            <span style="font-size: 12px; color: var(--text-muted);">點擊左側圓圈同步</span>
         </div>
-        <div id="records-list">
-            </div>
+        <div id="records-list"></div>
     </div>
 </div>
 
 <script>
-    // ⚠️ 請在此處填入你正確的 Google Apps Script 部署網址 (Web App URL)
+    // ⚠️ 記得在這邊貼上你的 Google Apps Script 網址 ！！！
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwHoLfX7MJ_yyVumhFQ3Ynwxo1hE3Kb2axfJ8e2hvjcth0ZooajHI7qOOEOk-J2Sq8l/exec"; 
 
     let recordsData = [];
     let todayExpenses = 0;
     let todayCalories = 0;
+
+    // 快捷輸入功能
+    function fillInput(text) {
+        document.getElementById('note-input').value = text;
+    }
 
     // 處理輸入並呼叫 AI 解析
     async function processNote() {
@@ -284,94 +236,89 @@
 
         if (!text) return;
 
-        // 鎖定介面
-        inputEl.disabled = true;
-        sendBtn.disabled = true;
-        loadingText.style.display = 'block';
+        inputEl.disabled = true; sendBtn.disabled = true; loadingText.style.display = 'block';
 
         try {
-            // 發送請求給 Google Apps Script 後端 (讓 AI 進行解析)
             const response = await fetch(WEB_APP_URL, {
-                method: 'POST',
                 method: 'POST',
                 body: JSON.stringify({ action: 'analyze', text: text })
             });
-            
             const result = await response.json();
             
             if (result.success) {
-                // 將解析後的數據加入本地列表
                 addRecordToList(result.data);
-                inputEl.value = ''; // 清空輸入框
+                inputEl.value = ''; 
             } else {
                 alert('AI 分析失敗：' + (result.message || '請檢查後端設定'));
             }
         } catch (error) {
-            console.error(error);
-            alert('連線失敗，請確認網路或 Google Apps Script 部署 URL 是否正確。');
+            console.error(error); alert('連線失敗，請確認網路。');
         } finally {
-            // 解鎖介面
-            inputEl.disabled = false;
-            sendBtn.disabled = false;
-            loadingText.style.display = 'none';
-        }f
+            inputEl.disabled = false; sendBtn.disabled = false; loadingText.style.display = 'none';
+        }
     }
 
     // 將資料渲染至網頁列表
     function addRecordToList(data) {
         const listContainer = document.getElementById('records-list');
         const recordId = 'rec_' + Date.now();
-        
-        // 儲存至全域陣列中
         recordsData.push({ id: recordId, ...data, synced: false });
 
         const itemDiv = document.createElement('div');
         itemDiv.className = 'record-item';
         itemDiv.id = recordId;
 
-        // 【功能更新】核心判斷：如果卡路里大於 0，自動為該整行加上 .has-calories 的淺色樣式提示
         if (data.calories && parseInt(data.calories) > 0) {
             itemDiv.classList.add('has-calories');
         }
 
-        // 格式化顯示內文
-        const amountText = data.amount ? `金額: $${data.amount}` : '';
-        const calorieText = data.calories ? `熱量: ${data.calories} kcal` : '';
-        const categoryText = data.category ? `分類: ${data.category}` : '一般';
+        const amountText = data.amount ? `$${data.amount}` : '';
+        const calorieText = data.calories ? `${data.calories} kcal` : '';
 
-        // 【功能更新】AI 解析後預設「不勾選」(不帶 checked 屬性)，完全由使用者人手勾選才觸發同步
         itemDiv.innerHTML = `
             <input type="checkbox" onchange="toggleSync('${recordId}', this)">
             <div class="record-info">
                 <div class="record-text">${data.originalText || data.text}</div>
                 <div class="record-meta">
-                    <span>${categoryText}</span>
-                    ${amountText ? `<span>${amountText}</span>` : ''}
-                    ${calorieText ? `<span>${calorieText}</span>` : ''}
+                    <span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">${data.category || '一般'}</span>
+                    ${amountText ? `<span style="color:#0f766e;">💰 ${amountText}</span>` : ''}
+                    ${calorieText ? `<span style="color:#b45309;">🔥 ${calorieText}</span>` : ''}
                 </div>
             </div>
             <div class="record-status status-pending" id="status-${recordId}">待確認</div>
+            <button class="delete-btn" id="del-${recordId}" onclick="deleteRecord('${recordId}')">🗑️</button>
         `;
 
-        // 新紀錄插在最上方
         listContainer.insertBefore(itemDiv, listContainer.firstChild);
     }
 
-    // 處理人手勾選同步到 Google Sheets 的邏輯
+    // 刪除未同步的紀錄
+    function deleteRecord(id) {
+        if(confirm("確定要刪除這筆紀錄嗎？")) {
+            const item = document.getElementById(id);
+            if(item) {
+                item.style.opacity = '0';
+                setTimeout(() => item.remove(), 300);
+            }
+            recordsData = recordsData.filter(r => r.id !== id);
+        }
+    }
+
+    // 勾選同步邏輯
     async function toggleSync(id, checkboxEl) {
         const statusEl = document.getElementById(`status-${id}`);
+        const deleteBtn = document.getElementById(`del-${id}`);
         const record = recordsData.find(r => r.id === id);
 
         if (!record) return;
 
-        // 如果被勾選且尚未同步
         if (checkboxEl.checked && !record.synced) {
-            statusEl.textContent = '同步中...';
+            statusEl.textContent = '傳送中';
             statusEl.className = 'record-status status-syncing';
-            checkboxEl.disabled = true; // 同步期間停用勾選框
+            checkboxEl.disabled = true; 
+            deleteBtn.style.display = 'none';
 
             try {
-                // 發送數據至 Google Sheets 存檔
                 const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'save', record: record })
@@ -379,25 +326,21 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    statusEl.textContent = '已同步';
+                    statusEl.textContent = '已儲存';
                     statusEl.className = 'record-status status-success';
                     record.synced = true;
-                    
-                    // 成功後更新頂部儀表板數據
                     updateDashboard(record.amount, record.calories);
-                } else {
-                    throw new Error('同步失敗');
-                }
+                } else { throw new Error('同步失敗'); }
             } catch (error) {
                 statusEl.textContent = '失敗';
                 statusEl.className = 'record-status status-failed';
-                checkboxEl.checked = false; // 失敗則取消勾選
+                checkboxEl.checked = false; 
                 checkboxEl.disabled = false;
+                deleteBtn.style.display = 'block';
             }
         }
     }
 
-    // 更新儀表板數據邏輯
     function updateDashboard(amount, calories) {
         if (amount) {
             todayExpenses += parseInt(amount) || 0;
