@@ -7,7 +7,7 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="生活筆記">
+    <meta name="apple-mobile-web-app-title" content="LifeSync">
     <link rel="apple-touch-icon" href="logo.png">
 
     <style>
@@ -21,8 +21,6 @@
             --success-bg: #f0fdf4;
             --success-border: #4ade80;
             --danger-color: #ef4444;
-            
-            /* 舊版經典顏色 */
             --dark-green: #2e7d32;
             --btn-food: #f57c00;
             --btn-expense: #e91e63;
@@ -40,38 +38,29 @@
 
         .container { max-width: 600px; margin: 0 auto; padding: 16px; }
 
-        /* 經典頂部標題 */
         h2.main-title { text-align: center; margin-top: 10px; font-size: 22px; color: #333; }
         .date-display { text-align: center; color: #ff5722; font-weight: bold; margin-bottom: 20px; font-size: 14px; }
 
-        /* 狀態卡片 */
         .status-card {
             background: var(--card-bg); border-radius: 12px; padding: 15px; text-align: center; 
             margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .status-text { color: #16a34a; font-weight: bold; margin-bottom: 10px; font-size: 14px; }
-        .refresh-btn {
-            background: white; border: 1px solid #d1d5db; border-radius: 20px; 
-            padding: 6px 16px; font-size: 13px; cursor: pointer; color: #4b5563;
-        }
 
-        /* 綠色儀表板 */
         .green-dashboard {
             background: var(--dark-green); color: white; border-radius: 12px; padding: 20px 10px; 
             display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .dash-item { flex: 1; }
-        .dash-label { font-size: 12px; opacity: 0.9; margin-bottom: 4px; }
-        .dash-value { font-size: 20px; font-weight: bold; }
+        .dash-label { font-size: 11px; opacity: 0.9; margin-bottom: 4px; }
+        .dash-value { font-size: 19px; font-weight: bold; }
         .dash-divider { width: 1px; background: rgba(255,255,255,0.3); margin: 0 5px; }
 
-        /* 分類按鈕區 */
         .category-box {
             background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        .category-title { font-weight: bold; margin-bottom: 15px; font-size: 15px; }
         .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .cat-btn {
             color: white; border: none; padding: 16px; border-radius: 12px; 
@@ -83,37 +72,32 @@
         .cat-work { background: var(--btn-work); }
         .cat-transit { background: var(--btn-transit); }
 
-        /* 藍色輸入區 */
         .input-section {
             background: var(--card-bg); border: 2px solid #3b82f6; border-radius: 16px; 
             padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        .input-title { font-weight: bold; font-size: 18px; margin-bottom: 6px; color: #1f2937; }
-        .input-subtitle { font-size: 13px; color: #6b7280; margin-bottom: 12px; }
-        
         textarea {
             width: 100%; height: 50px; padding: 12px; margin-bottom: 8px;
             border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; resize: none; outline: none;
         }
-        textarea:focus { border-color: var(--primary-color); }
 
-        /* AI 選項與按鈕排版 */
-        .ai-toggle-container { margin-bottom: 12px; }
+        /* AI 選項 (預設隱藏) */
+        #ai-toggle-container { 
+            display: none; 
+            margin-bottom: 12px; 
+        }
         .ai-toggle-label { 
             display: inline-flex; align-items: center; gap: 8px; font-size: 14px; 
             color: var(--text-main); font-weight: 600; cursor: pointer; 
-            background: #f0fdf4; padding: 8px 12px; border-radius: 8px; border: 1px solid #bbf7d0;
+            background: #fff9c4; padding: 8px 12px; border-radius: 8px; border: 1px solid #fff176;
         }
-        .ai-toggle-label input { width: 18px; height: 18px; accent-color: var(--primary-color); cursor: pointer; }
+        .ai-toggle-label input { width: 18px; height: 18px; accent-color: var(--primary-color); }
 
         button.main-btn {
             width: 100%; border: none; border-radius: 12px; padding: 12px 0; font-size: 16px; font-weight: bold;
             cursor: pointer; transition: 0.2s; color: white; background: var(--primary-color); margin-bottom: 16px;
         }
-        button.main-btn:active { transform: scale(0.97); }
-        button.main-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* 快捷標籤系統 (Quick Chips) */
         .quick-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
         .quick-chips::-webkit-scrollbar { display: none; }
         .chip {
@@ -121,12 +105,10 @@
             font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s;
         }
 
-        /* 列表區塊 */
         .list-section { background: var(--card-bg); border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
         .list-header { padding: 16px; font-weight: bold; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
         
         .record-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #e5e7eb; gap: 14px; position: relative; }
-        .record-item:last-child { border-bottom: none; }
         .record-item.has-calories { background-color: var(--success-bg); border-left: 4px solid var(--success-border); }
 
         .record-item input[type="checkbox"] {
@@ -137,7 +119,6 @@
         .record-item input[type="checkbox"]:checked::after {
             content: '✓'; color: white; position: absolute; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px;
         }
-        .record-item input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .record-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .record-text { font-size: 16px; font-weight: bold; }
@@ -147,10 +128,8 @@
         .status-pending { color: #f59e0b; }
         .status-syncing { color: #3b82f6; }
         .status-success { color: #10b981; }
-        .status-failed { color: #ef4444; }
 
         .delete-btn { background: none; border: none; font-size: 18px; color: #cbd5e1; cursor: pointer; padding: 4px; }
-        .delete-btn:hover { color: var(--danger-color); }
         .loading-spinner { display: none; text-align: center; padding: 12px; color: var(--primary-color); font-size: 14px; font-weight: bold; }
     </style>
 </head>
@@ -162,7 +141,6 @@
 
     <div class="status-card">
         <div class="status-text">✅ 雲端連線成功！資料已即時同步</div>
-        <button class="refresh-btn" onclick="location.reload()">🔄 手動重新整理資料</button>
     </div>
 
     <div class="green-dashboard">
@@ -178,27 +156,23 @@
         <div class="dash-divider"></div>
         <div class="dash-item">
             <div class="dash-label">🔥 今日攝取熱量</div>
-            <div class="dash-value"><span id="total-calories">0</span> <span style="font-size:12px">kcal</span></div>
+            <div class="dash-value"><span id="total-calories">0</span> <span style="font-size:10px">kcal</span></div>
         </div>
     </div>
 
     <div class="category-box">
-        <div class="category-title">🚀 請選擇記錄項目：</div>
         <div class="cat-grid">
-            <button class="cat-btn cat-food" onclick="setPrefix('🍔 食野')">🍔 食野</button>
-            <button class="cat-btn cat-expense" onclick="setPrefix('💵 洗費')">💵 洗費</button>
-            <button class="cat-btn cat-work" onclick="setPrefix('💼 工作')">💼 工作</button>
-            <button class="cat-btn cat-transit" onclick="setPrefix('🚗 交通')">🚗 交通</button>
+            <button class="cat-btn cat-food" onclick="setPrefix('🍔 食野', true)">🍔 食野</button>
+            <button class="cat-btn cat-expense" onclick="setPrefix('💵 洗費', false)">💵 洗費</button>
+            <button class="cat-btn cat-work" onclick="setPrefix('💼 工作', false)">💼 工作</button>
+            <button class="cat-btn cat-transit" onclick="setPrefix('🚗 交通', false)">🚗 交通</button>
         </div>
     </div>
 
     <div class="input-section">
-        <div class="input-title">📝 記錄動態</div>
-        <div class="input-subtitle">請直接輸入內容與金額</div>
-        
         <textarea id="note-input" placeholder="例如：叉燒飯 55"></textarea>
         
-        <div class="ai-toggle-container">
+        <div id="ai-toggle-container">
             <label class="ai-toggle-label">
                 <input type="checkbox" id="ai-checkbox">
                 ✨ 啟用 AI 智能分析 (自動計算卡路里)
@@ -214,20 +188,20 @@
             <button class="chip" onclick="addQuickRecord('🧗‍♂️ 抱石攀岩', '', '運動', '400')">+ 攀岩</button>
         </div>
 
-        <div id="loading-text" class="loading-spinner">⚡ AI 智慧解析中...</div>
+        <div id="loading-text" class="loading-spinner">⚡ AI 正在分析熱量與運動數據...</div>
     </div>
 
     <div class="list-section">
         <div class="list-header">
             <span>📌 紀錄 (待確認)</span>
-            <span style="font-size: 12px; color: var(--text-muted); font-weight: normal;">需手動點選 ◯ 同步</span>
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">剔 ◯ 即可同步到雲端</span>
         </div>
         <div id="records-list"></div>
     </div>
 </div>
 
 <script>
-    // ✅ 已經換上你最新提供嘅專屬網址
+    // ✅ 已更新為你提供的網址
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz2N0ymn2Dtr3QheEhvsslV_ckVju3VMFQtQztNVDIGc702v4ZRODPcgqxM5BzT96Kg/exec"; 
 
     let recordsData = [];
@@ -235,7 +209,6 @@
     let foodExpenses = 0;
     let totalCalories = 0;
 
-    // 設定日期
     function initDate() {
         const now = new Date();
         const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -243,30 +216,44 @@
     }
     initDate();
 
-    // 點擊四宮格按鈕，將分類文字自動填入輸入框並向下捲動
-    function setPrefix(catText) {
+    // 控制 AI 選項顯示邏輯：只有選了食野先至顯示
+    function setPrefix(catText, showAI) {
         const inputEl = document.getElementById('note-input');
+        const aiContainer = document.getElementById('ai-toggle-container');
+        const aiCheckbox = document.getElementById('ai-checkbox');
+
         inputEl.value = `[${catText}] `;
         inputEl.focus();
+        
+        if (showAI) {
+            aiContainer.style.display = 'block';
+            aiCheckbox.checked = true; // 預設食野就幫你勾埋
+        } else {
+            aiContainer.style.display = 'none';
+            aiCheckbox.checked = false;
+        }
         inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // 快捷標籤直接加入
     function addQuickRecord(text, amount, category, calories) {
         addRecordToList({ text: text, originalText: text, amount: amount, category: category, calories: calories });
     }
 
-    // 【全新功能】統一處理送出按鈕
     function handleSubmit() {
+        const inputEl = document.getElementById('note-input');
         const useAI = document.getElementById('ai-checkbox').checked;
-        if (useAI) {
-            processNoteWithAI(); // 如果有打剔，就叫 AI
+        const text = inputEl.value.trim();
+
+        // 如果包含運動關鍵字，強制問 AI
+        if (text.includes('HIIT') || text.includes('攀岩') || text.includes('運動') || text.includes('分鐘')) {
+            processNoteWithAI();
+        } else if (useAI) {
+            processNoteWithAI();
         } else {
-            addDirectly();       // 如果無打剔，就極速加入
+            addDirectly();
         }
     }
 
-    // 直接加入 (免 AI 解析邏輯)
     function addDirectly() {
         const inputEl = document.getElementById('note-input');
         let text = inputEl.value.trim();
@@ -274,32 +261,25 @@
 
         let amount = "";
         let category = "一般";
-        
-        // 偵測是否使用了四宮格的標籤
         const catMatch = text.match(/^\[(.*?)\]\s*(.*)$/);
         if(catMatch) {
             category = catMatch[1].replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '');
             text = catMatch[2];
         }
-
-        // 拆分最後的數字作為金額
         const amtMatch = text.match(/^(.*?)\s+(\d+)$/);
         if (amtMatch) {
             text = amtMatch[1].trim();
             amount = amtMatch[2];
         }
-
         addRecordToList({ text: text, originalText: inputEl.value.trim(), amount: amount, category: category, calories: '' });
         inputEl.value = ''; 
     }
 
-    // AI 智能分析邏輯
     async function processNoteWithAI() {
         const inputEl = document.getElementById('note-input');
         const submitBtn = document.getElementById('submit-btn');
         const loadingText = document.getElementById('loading-text');
         const text = inputEl.value.trim();
-
         if (!text) return;
 
         inputEl.disabled = true; submitBtn.disabled = true; 
@@ -311,7 +291,6 @@
                 body: JSON.stringify({ action: 'analyze', text: text })
             });
             const result = await response.json();
-            
             if (result.success) {
                 addRecordToList(result.data);
                 inputEl.value = ''; 
@@ -319,14 +298,13 @@
                 alert('AI 分析失敗：' + (result.message || '請檢查後端設定'));
             }
         } catch (error) {
-            console.error(error); alert('連線失敗，請檢查網路或 URL。');
+            alert('連線失敗，請檢查網路。');
         } finally {
             inputEl.disabled = false; submitBtn.disabled = false; 
             loadingText.style.display = 'none';
         }
     }
 
-    // 將資料渲染至列表
     function addRecordToList(data) {
         const listContainer = document.getElementById('records-list');
         const recordId = 'rec_' + Date.now();
@@ -356,67 +334,49 @@
             <div class="record-status status-pending" id="status-${recordId}">待確認</div>
             <button class="delete-btn" id="del-${recordId}" onclick="deleteRecord('${recordId}')">🗑️</button>
         `;
-
         listContainer.insertBefore(itemDiv, listContainer.firstChild);
     }
 
-    // 刪除未同步的紀錄
     function deleteRecord(id) {
         const item = document.getElementById(id);
-        if(item) {
-            item.style.opacity = '0';
-            setTimeout(() => item.remove(), 300);
-        }
+        if(item) { item.remove(); }
         recordsData = recordsData.filter(r => r.id !== id);
     }
 
-    // 勾選同步邏輯
     async function toggleSync(id, checkboxEl) {
         const statusEl = document.getElementById(`status-${id}`);
-        const deleteBtn = document.getElementById(`del-${id}`);
         const record = recordsData.find(r => r.id === id);
-
-        if (!record) return;
-
         if (checkboxEl.checked && !record.synced) {
             statusEl.textContent = '傳送中';
             statusEl.className = 'record-status status-syncing';
             checkboxEl.disabled = true; 
-            deleteBtn.style.display = 'none';
-
             try {
                 const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'save', record: record })
                 });
                 const result = await response.json();
-
                 if (result.success) {
                     statusEl.textContent = '已儲存';
                     statusEl.className = 'record-status status-success';
                     record.synced = true;
                     updateDashboard(record);
-                } else { throw new Error('同步失敗'); }
+                }
             } catch (error) {
                 statusEl.textContent = '失敗';
-                statusEl.className = 'record-status status-failed';
-                checkboxEl.checked = false; 
-                checkboxEl.disabled = false;
-                deleteBtn.style.display = 'block';
+                checkboxEl.checked = false; checkboxEl.disabled = false;
             }
         }
     }
 
-    // 更新綠色儀表板數據
     function updateDashboard(record) {
         const amt = parseInt(record.amount) || 0;
         const cal = parseInt(record.calories) || 0;
         const cat = record.category || "";
-
         if (amt > 0) {
             totalExpenses += amt;
             document.getElementById('total-expenses').textContent = totalExpenses;
-            if (cat.includes('食') || cat.includes('飲食') || record.originalText.includes('食')) {
+            if (cat.includes('食') || record.originalText.includes('食')) {
                 foodExpenses += amt;
                 document.getElementById('food-expenses').textContent = foodExpenses;
             }
