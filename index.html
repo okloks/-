@@ -4,23 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>智慧雲端生活筆記</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="LifeSync">
+    <link rel="apple-touch-icon" href="logo.png">
+
     <style>
         :root { --dark-green: #2e7d32; --btn-food: #f57c00; --btn-expense: #e91e63; --btn-work: #6d4c41; --btn-transit: #2196f3; --primary: #4f46e5; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f3f6f9; padding: 20px; margin: 0; }
         .container { max-width: 600px; margin: 0 auto; }
         
-        h2 { text-align: center; font-size: 22px; color: #333; margin-bottom: 15px; }
+        /* 標題與日期 */
+        h2 { text-align: center; font-size: 22px; color: #333; margin-bottom: 5px; }
         .date-text { text-align: center; color: #ff5722; font-weight: bold; margin-bottom: 15px; font-size: 14px; }
 
+        /* 綠色儀表板 */
         .green-dashboard { background: var(--dark-green); color: white; border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .dash-item { text-align: center; flex: 1; }
         .dash-label { font-size: 10px; opacity: 0.8; }
         .dash-value { font-size: 18px; font-weight: bold; margin-top: 5px; }
 
+        /* 四宮格按鈕 */
         .cat-box { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .cat-title { font-weight: bold; margin-bottom: 12px; font-size: 15px; }
         .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .cat-btn { color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
 
+        /* 輸入區 */
         .input-section { background: white; border: 2px solid #3b82f6; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
         textarea { width: 100%; height: 50px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; }
         #ai-toggle-container { display: none; margin-bottom: 10px; background: #fff9c4; padding: 8px; border-radius: 8px; font-size: 14px; font-weight: bold; }
@@ -30,6 +41,7 @@
         .quick-chips { display: flex; gap: 8px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px; }
         .chip { background: #f3f4f6; border: 1px solid #d1d5db; padding: 6px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; }
 
+        /* 列表區 */
         .record-item { background: white; padding: 15px; margin-bottom: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px; border-left: 4px solid #ddd; }
         .has-calories { border-left-color: #10b981; background: #f0fdf4; }
         .record-info { flex: 1; }
@@ -49,6 +61,7 @@
         </div>
 
         <div class="cat-box">
+            <div class="cat-title">🚀 選擇記錄項目：</div>
             <div class="cat-grid">
                 <button class="cat-btn" style="background:var(--btn-food)" onclick="setPrefix('🍔 食野', true)">🍔 食野</button>
                 <button class="cat-btn" style="background:var(--btn-expense)" onclick="setPrefix('💵 洗費', false)">💵 洗費</button>
@@ -58,7 +71,7 @@
         </div>
 
         <div class="input-section">
-            <textarea id="note-input" placeholder="輸入內容或點選快捷標籤..."></textarea>
+            <textarea id="note-input" placeholder="直接輸入內容或點選上方按鈕..."></textarea>
             <div id="ai-toggle-container">
                 <label><input type="checkbox" id="ai-checkbox"> ✨ AI 分析</label>
             </div>
@@ -76,6 +89,7 @@
     </div>
 
 <script>
+    // ⚠️ 已經幫你放入咗最新嗰條 URL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPTI3Z7N11eyOFUGBQ8Zscbf0S7uFqofUjVb1zhDuW-GIE-DYNQ__hx96pSHNevKtO/exec"; 
 
     document.getElementById('date-display').textContent = new Date().toLocaleDateString('zh-HK', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
