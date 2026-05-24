@@ -6,36 +6,27 @@
     <title>智慧雲端生活筆記</title>
     <style>
         :root { --primary-color: #4f46e5; --bg-color: #f3f6f9; --dark-green: #2e7d32; --btn-food: #f57c00; --btn-expense: #e91e63; --btn-work: #6d4c41; --btn-transit: #2196f3; }
-        body { font-family: -apple-system, sans-serif; background-color: var(--bg-color); padding: 20px; margin: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); padding: 20px; margin: 0; }
         .container { max-width: 600px; margin: 0 auto; }
-        h2 { text-align: center; margin-bottom: 5px; color: #333; }
-        .date-display { text-align: center; color: #ff5722; font-size: 13px; margin-bottom: 15px; font-weight: bold; }
-        
-        .green-dashboard { background: var(--dark-green); color: white; border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { text-align: center; margin-bottom: 10px; color: #333; }
+        .green-dashboard { background: var(--dark-green); color: white; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .dash-item { text-align: center; flex: 1; }
-        .dash-label { font-size: 10px; opacity: 0.9; }
-        .dash-value { font-size: 16px; font-weight: bold; margin-top: 5px; }
-        
+        .dash-label { font-size: 11px; opacity: 0.9; }
+        .dash-value { font-size: 18px; font-weight: bold; margin-top: 5px; }
         .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .cat-btn { color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        .input-section { background: white; padding: 20px; border-radius: 12px; border: 2px solid var(--primary-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        textarea { width: 100%; height: 60px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; }
+        .cat-btn { color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .input-section { background: white; padding: 20px; border-radius: 12px; border: 2px solid var(--primary-color); }
+        textarea { width: 100%; height: 60px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; }
         #ai-toggle-container { display: none; margin-bottom: 10px; padding: 10px; background: #fff9c4; border-radius: 8px; font-size: 14px; font-weight: bold; }
         .main-btn { width: 100%; padding: 15px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        
-        .record-item { background: white; padding: 15px; margin-top: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid #ddd; }
+        .record-item { background: white; padding: 15px; margin-top: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; border-left: 4px solid #ddd; }
         .has-calories { border-left-color: #4ade80; background: #f0fdf4; }
-        .record-info { flex: 1; }
-        .record-text { font-weight: bold; }
-        .record-meta { font-size: 12px; color: #666; }
         .loading { display: none; text-align: center; padding: 10px; color: var(--primary-color); font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>☁️ 智慧雲端生活筆記</h2>
-        <div class="date-display" id="date-display"></div>
         
         <div class="green-dashboard">
             <div class="dash-item"><div class="dash-label">洗費</div><div class="dash-value">$ <span id="total-expenses">0</span></div></div>
@@ -63,10 +54,7 @@
     </div>
 
 <script>
-    // 已更新為你最新提供嘅網址
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPTI3Z7N11eyOFUGBQ8Zscbf0S7uFqofUjVb1zhDuW-GIE-DYNQ__hx96pSHNevKtO/exec"; 
-
-    document.getElementById('date-display').textContent = new Date().toLocaleDateString('zh-HK', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
 
     function setPrefix(catText, showAI) {
         document.getElementById('note-input').value = `[${catText}] `;
@@ -85,7 +73,7 @@
             try {
                 const res = await fetch(WEB_APP_URL, {method: 'POST', body: JSON.stringify({action: 'analyze', text: text})});
                 const data = await res.json();
-                if(data.success) addToList(data.data); else alert("分析失敗: " + data.message);
+                if(data.success) addToList(data.data); else alert("分析失敗");
             } catch(e) { alert("連線失敗"); }
             load.style.display = 'none';
         } else {
@@ -112,23 +100,20 @@
         if(checkbox.checked) {
             const data = JSON.parse(dataStr);
             const res = await fetch(WEB_APP_URL, {method: 'POST', body: JSON.stringify({action: 'save', record: data})});
-            const result = await res.json();
-            if(result.success) {
+            if((await res.json()).success) {
                 checkbox.disabled = true;
+                checkbox.parentElement.innerHTML += '<span style="font-size:12px"> ✅</span>';
                 updateDash(data);
-            } else {
-                alert("同步失敗");
-                checkbox.checked = false;
             }
         }
     }
 
     function updateDash(d) {
         if(d.amount) {
-            document.getElementById('total-expenses').textContent = parseInt(document.getElementById('total-expenses').textContent) + parseInt(d.amount);
-            if(d.category.includes('食')) document.getElementById('food-expenses').textContent = parseInt(document.getElementById('food-expenses').textContent) + parseInt(d.amount);
+            document.getElementById('total-expenses').textContent = parseInt(document.getElementById('total-expenses').textContent || 0) + parseInt(d.amount || 0);
+            if(d.category.includes('食')) document.getElementById('food-expenses').textContent = parseInt(document.getElementById('food-expenses').textContent || 0) + parseInt(d.amount || 0);
         }
-        if(d.calories) document.getElementById('total-calories').textContent = parseInt(document.getElementById('total-calories').textContent) + parseInt(d.calories);
+        if(d.calories) document.getElementById('total-calories').textContent = parseInt(document.getElementById('total-calories').textContent || 0) + parseInt(d.calories || 0);
     }
 </script>
 </body>
