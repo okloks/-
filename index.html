@@ -41,6 +41,12 @@
         h2.main-title { text-align: center; margin-top: 10px; font-size: 22px; color: #333; }
         .date-display { text-align: center; color: #ff5722; font-weight: bold; margin-bottom: 20px; font-size: 14px; }
 
+        .status-card {
+            background: var(--card-bg); border-radius: 12px; padding: 15px; text-align: center; 
+            margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .status-text { color: #16a34a; font-weight: bold; margin-bottom: 10px; font-size: 14px; }
+
         .green-dashboard {
             background: var(--dark-green); color: white; border-radius: 12px; padding: 20px 10px; 
             display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px;
@@ -51,7 +57,11 @@
         .dash-value { font-size: 19px; font-weight: bold; }
         .dash-divider { width: 1px; background: rgba(255,255,255,0.3); margin: 0 5px; }
 
-        .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .category-box {
+            background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .cat-btn {
             color: white; border: none; padding: 16px; border-radius: 12px; 
             font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s;
@@ -71,7 +81,11 @@
             border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; resize: none; outline: none;
         }
 
-        #ai-toggle-container { display: none; margin-bottom: 12px; }
+        /* AI 選項 (預設隱藏) */
+        #ai-toggle-container { 
+            display: none; 
+            margin-bottom: 12px; 
+        }
         .ai-toggle-label { 
             display: inline-flex; align-items: center; gap: 8px; font-size: 14px; 
             color: var(--text-main); font-weight: 600; cursor: pointer; 
@@ -79,17 +93,44 @@
         }
         .ai-toggle-label input { width: 18px; height: 18px; accent-color: var(--primary-color); }
 
-        .main-btn {
+        button.main-btn {
             width: 100%; border: none; border-radius: 12px; padding: 12px 0; font-size: 16px; font-weight: bold;
             cursor: pointer; transition: 0.2s; color: white; background: var(--primary-color); margin-bottom: 16px;
         }
 
-        .record-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #e5e7eb; gap: 14px; position: relative; background: white; }
-        .has-calories { background-color: var(--success-bg); border-left: 4px solid var(--success-border); }
-        .record-info { flex: 1; }
+        .quick-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .quick-chips::-webkit-scrollbar { display: none; }
+        .chip {
+            background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 16px; padding: 6px 12px;
+            font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.2s;
+        }
+
+        .list-section { background: var(--card-bg); border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow: hidden; }
+        .list-header { padding: 16px; font-weight: bold; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
+        
+        .record-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid #e5e7eb; gap: 14px; position: relative; }
+        .record-item.has-calories { background-color: var(--success-bg); border-left: 4px solid var(--success-border); }
+
+        .record-item input[type="checkbox"] {
+            appearance: none; -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%;
+            border: 2px solid #cbd5e1; cursor: pointer; position: relative; flex-shrink: 0; background: #fff;
+        }
+        .record-item input[type="checkbox"]:checked { background-color: #10b981; border-color: #10b981; }
+        .record-item input[type="checkbox"]:checked::after {
+            content: '✓'; color: white; position: absolute; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px;
+        }
+
+        .record-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
         .record-text { font-size: 16px; font-weight: bold; }
-        .record-meta { font-size: 13px; color: var(--text-muted); }
-        .loading-spinner { display: none; text-align: center; padding: 12px; color: var(--primary-color); font-weight: bold; }
+        .record-meta { font-size: 13px; color: var(--text-muted); display: flex; gap: 12px; }
+        
+        .record-status { font-size: 13px; font-weight: bold; min-width: 45px; text-align: right; }
+        .status-pending { color: #f59e0b; }
+        .status-syncing { color: #3b82f6; }
+        .status-success { color: #10b981; }
+
+        .delete-btn { background: none; border: none; font-size: 18px; color: #cbd5e1; cursor: pointer; padding: 4px; }
+        .loading-spinner { display: none; text-align: center; padding: 12px; color: var(--primary-color); font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -98,109 +139,253 @@
     <h2 class="main-title">☁️ 智慧雲端生活筆記</h2>
     <div class="date-display" id="current-date">📅 載入中...</div>
 
+    <div class="status-card">
+        <div class="status-text">✅ 雲端連線成功！資料已即時同步</div>
+    </div>
+
     <div class="green-dashboard">
         <div class="dash-item">
-            <div class="dash-label">💵 洗費</div>
+            <div class="dash-label">💵 本月洗費總計</div>
             <div class="dash-value">$ <span id="total-expenses">0</span></div>
         </div>
         <div class="dash-divider"></div>
         <div class="dash-item">
-            <div class="dash-label">🍔 食野</div>
+            <div class="dash-label">🍔 本月食野開銷</div>
             <div class="dash-value">$ <span id="food-expenses">0</span></div>
         </div>
         <div class="dash-divider"></div>
         <div class="dash-item">
-            <div class="dash-label">🔥 熱量</div>
+            <div class="dash-label">🔥 今日攝取熱量</div>
             <div class="dash-value"><span id="total-calories">0</span> <span style="font-size:10px">kcal</span></div>
         </div>
     </div>
 
-    <div class="cat-grid">
-        <button class="cat-btn cat-food" onclick="setPrefix('🍔 食野', true)">🍔 食野</button>
-        <button class="cat-btn cat-expense" onclick="setPrefix('💵 洗費', false)">💵 洗費</button>
-        <button class="cat-btn cat-work" onclick="setPrefix('🏃‍♂️ 運動', true)">🏃‍♂️ 運動</button>
-        <button class="cat-btn cat-transit" onclick="setPrefix('🚗 交通', false)">🚗 交通</button>
+    <div class="category-box">
+        <div class="cat-grid">
+            <button class="cat-btn cat-food" onclick="setPrefix('🍔 食野', true)">🍔 食野</button>
+            <button class="cat-btn cat-expense" onclick="setPrefix('💵 洗費', false)">💵 洗費</button>
+            <button class="cat-btn cat-work" onclick="setPrefix('🏃‍♂️ 運動/工作', true)">🏃‍♂️ 運動/工作</button>
+            <button class="cat-btn cat-transit" onclick="setPrefix('🚗 交通', false)">🚗 交通</button>
+        </div>
     </div>
 
     <div class="input-section">
         <textarea id="note-input" placeholder="例如：叉燒飯 55"></textarea>
+        
         <div id="ai-toggle-container">
             <label class="ai-toggle-label">
-                <input type="checkbox" id="ai-checkbox"> ✨ AI 分析
+                <input type="checkbox" id="ai-checkbox">
+                ✨ 分析
             </label>
         </div>
-        <button class="main-btn" onclick="handleSubmit()">➕ 記錄加入清單</button>
-        <div id="loading-text" class="loading-spinner">⚡ AI 正在分析...</div>
+
+        <button id="submit-btn" class="main-btn" onclick="handleSubmit()">➕ 記錄加入清單</button>
+        
+        <div class="quick-chips">
+            <button class="chip" onclick="addQuickRecord('☕ 咖啡', '45', '飲食', '')">+ 咖啡</button>
+            <button class="chip" onclick="addQuickRecord('🍱 便當', '60', '飲食', '')">+ 便當</button>
+            <button class="chip" onclick="addQuickRecord('🏃‍♂️ HIIT 30分鐘', '', '運動', '300')">+ HIIT</button>
+            <button class="chip" onclick="addQuickRecord('🧗‍♂️ 抱石攀岩', '', '運動', '400')">+ 攀岩</button>
+        </div>
+
+        <div id="loading-text" class="loading-spinner">⚡ AI 正在分析熱量與運動數據...</div>
     </div>
 
-    <div id="records-list" class="list-section"></div>
+    <div class="list-section">
+        <div class="list-header">
+            <span>📌 紀錄 (待確認)</span>
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: normal;">剔 ◯ 即可同步到雲端</span>
+        </div>
+        <div id="records-list"></div>
+    </div>
 </div>
 
 <script>
-    // 你的正確網址
+    // 已經寫入你最新提供嘅 URL
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPTI3Z7N11eyOFUGBQ8Zscbf0S7uFqofUjVb1zhDuW-GIE-DYNQ__hx96pSHNevKtO/exec"; 
 
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString('zh-HK', {year:'numeric', month:'long', day:'numeric', weekday:'long'});
+    let recordsData = [];
+    let totalExpenses = 0;
+    let foodExpenses = 0;
+    let totalCalories = 0;
 
+    function initDate() {
+        const now = new Date();
+        const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        document.getElementById('current-date').textContent = `📅 ${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${days[now.getDay()]}`;
+    }
+    initDate();
+
+    // 控制 AI 選項顯示邏輯
     function setPrefix(catText, showAI) {
-        document.getElementById('note-input').value = `[${catText}] `;
-        document.getElementById('ai-toggle-container').style.display = showAI ? 'block' : 'none';
-        document.getElementById('ai-checkbox').checked = showAI;
+        const inputEl = document.getElementById('note-input');
+        const aiContainer = document.getElementById('ai-toggle-container');
+        const aiCheckbox = document.getElementById('ai-checkbox');
+
+        inputEl.value = `[${catText}] `;
+        inputEl.focus();
+        
+        if (showAI) {
+            aiContainer.style.display = 'block';
+            aiCheckbox.checked = true;
+        } else {
+            aiContainer.style.display = 'none';
+            aiCheckbox.checked = false;
+        }
+        inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    async function handleSubmit() {
+    function addQuickRecord(text, amount, category, calories) {
+        addRecordToList({ text: text, originalText: text, amount: amount, category: category, calories: calories });
+    }
+
+    function handleSubmit() {
         const inputEl = document.getElementById('note-input');
         const useAI = document.getElementById('ai-checkbox').checked;
         const text = inputEl.value.trim();
-        const load = document.getElementById('loading-text');
 
-        if (!text) return;
-        if(useAI) {
-            load.style.display = 'block';
-            try {
-                const res = await fetch(WEB_APP_URL, {method: 'POST', body: JSON.stringify({action: 'analyze', text: text})});
-                const data = await res.json();
-                if(data.success) addToList(data.data); else alert("AI 分析失敗: " + data.message);
-            } catch(e) { alert("連線失敗"); }
-            load.style.display = 'none';
+        if (text.includes('HIIT') || text.includes('攀岩') || text.includes('運動') || text.includes('分鐘')) {
+            processNoteWithAI();
+        } else if (useAI) {
+            processNoteWithAI();
         } else {
-            addToList({text: text, amount: '', category: '一般', calories: ''});
+            addDirectly();
         }
-        inputEl.value = '';
     }
 
-    function addToList(data) {
-        const div = document.createElement('div');
-        div.className = `record-item ${data.calories ? 'has-calories' : ''}`;
-        div.innerHTML = `
-            <input type="checkbox" onchange="sync(this, '${JSON.stringify(data).replace(/'/g, "\\'")}')">
+    function addDirectly() {
+        const inputEl = document.getElementById('note-input');
+        let text = inputEl.value.trim();
+        if (!text) return;
+
+        let amount = "";
+        let category = "一般";
+        const catMatch = text.match(/^\[(.*?)\]\s*(.*)$/);
+        if(catMatch) {
+            category = catMatch[1].replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '');
+            text = catMatch[2];
+        }
+        const amtMatch = text.match(/^(.*?)\s+(\d+)$/);
+        if (amtMatch) {
+            text = amtMatch[1].trim();
+            amount = amtMatch[2];
+        }
+        addRecordToList({ text: text, originalText: inputEl.value.trim(), amount: amount, category: category, calories: '' });
+        inputEl.value = ''; 
+    }
+
+    async function processNoteWithAI() {
+        const inputEl = document.getElementById('note-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const loadingText = document.getElementById('loading-text');
+        const text = inputEl.value.trim();
+        if (!text) return;
+
+        inputEl.disabled = true; submitBtn.disabled = true; 
+        loadingText.style.display = 'block';
+
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'analyze', text: text })
+            });
+            const result = await response.json();
+            if (result.success) {
+                addRecordToList(result.data);
+                inputEl.value = ''; 
+            } else {
+                alert('AI 分析失敗：' + (result.message || '請檢查後端設定'));
+            }
+        } catch (error) {
+            alert('連線失敗，請檢查網路。');
+        } finally {
+            inputEl.disabled = false; submitBtn.disabled = false; 
+            loadingText.style.display = 'none';
+        }
+    }
+
+    function addRecordToList(data) {
+        const listContainer = document.getElementById('records-list');
+        const recordId = 'rec_' + Date.now();
+        recordsData.push({ id: recordId, ...data, synced: false });
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'record-item';
+        itemDiv.id = recordId;
+
+        if (data.calories && parseInt(data.calories) > 0) {
+            itemDiv.classList.add('has-calories');
+        }
+
+        const amountText = data.amount ? `$${data.amount}` : '';
+        const calorieText = data.calories ? `${data.calories} kcal` : '';
+
+        itemDiv.innerHTML = `
+            <input type="checkbox" onchange="toggleSync('${recordId}', this)">
             <div class="record-info">
-                <div class="record-text">${data.text}</div>
-                <div class="record-meta">${data.amount ? '$'+data.amount : ''} ${data.calories ? data.calories+'kcal' : ''}</div>
+                <div class="record-text">${data.originalText || data.text}</div>
+                <div class="record-meta">
+                    <span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">${data.category || '一般'}</span>
+                    ${amountText ? `<span style="color:#0f766e;">💰 ${amountText}</span>` : ''}
+                    ${calorieText ? `<span style="color:#b45309;">🔥 ${calorieText}</span>` : ''}
+                </div>
             </div>
-            <button onclick="this.parentElement.remove()" style="border:none;background:none;color:#ccc">🗑️</button>
+            <div class="record-status status-pending" id="status-${recordId}">待確認</div>
+            <button class="delete-btn" id="del-${recordId}" onclick="deleteRecord('${recordId}')">🗑️</button>
         `;
-        document.getElementById('records-list').appendChild(div);
+        listContainer.insertBefore(itemDiv, listContainer.firstChild);
     }
 
-    async function sync(checkbox, dataStr) {
-        if(checkbox.checked) {
-            const data = JSON.parse(dataStr);
-            const res = await fetch(WEB_APP_URL, {method: 'POST', body: JSON.stringify({action: 'save', record: data})});
-            if((await res.json()).success) {
-                checkbox.disabled = true;
-                updateDash(data);
+    function deleteRecord(id) {
+        const item = document.getElementById(id);
+        if(item) { item.remove(); }
+        recordsData = recordsData.filter(r => r.id !== id);
+    }
+
+    async function toggleSync(id, checkboxEl) {
+        const statusEl = document.getElementById(`status-${id}`);
+        const record = recordsData.find(r => r.id === id);
+        if (checkboxEl.checked && !record.synced) {
+            statusEl.textContent = '傳送中';
+            statusEl.className = 'record-status status-syncing';
+            checkboxEl.disabled = true; 
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'save', record: record })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    statusEl.textContent = '已儲存';
+                    statusEl.className = 'record-status status-success';
+                    record.synced = true;
+                    updateDashboard(record);
+                }
+            } catch (error) {
+                statusEl.textContent = '失敗';
+                checkboxEl.checked = false; checkboxEl.disabled = false;
             }
         }
     }
 
-    function updateDash(d) {
-        if(d.amount) {
-            document.getElementById('total-expenses').textContent = parseInt(document.getElementById('total-expenses').textContent || 0) + parseInt(d.amount || 0);
-            if(d.category.includes('食')) document.getElementById('food-expenses').textContent = parseInt(document.getElementById('food-expenses').textContent || 0) + parseInt(d.amount || 0);
+    function updateDashboard(record) {
+        const amt = parseInt(record.amount) || 0;
+        const cal = parseInt(record.calories) || 0;
+        const cat = record.category || "";
+        if (amt > 0) {
+            totalExpenses += amt;
+            document.getElementById('total-expenses').textContent = totalExpenses;
+            if (cat.includes('食') || record.originalText.includes('食')) {
+                foodExpenses += amt;
+                document.getElementById('food-expenses').textContent = foodExpenses;
+            }
         }
-        if(d.calories) document.getElementById('total-calories').textContent = parseInt(document.getElementById('total-calories').textContent || 0) + parseInt(d.calories || 0);
+        if (cal > 0) {
+            totalCalories += cal;
+            document.getElementById('total-calories').textContent = totalCalories;
+        }
     }
 </script>
+
 </body>
 </html>
