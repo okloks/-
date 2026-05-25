@@ -5,64 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LifeSync 智慧生活筆記</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     
     <style>
         :root { --dark-green: #2e7d32; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f3f6f9; color: #1f2937; padding: 16px;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f3f6f9; color: #1f2937; padding: 16px; }
         .container { max-width: 640px; margin: 0 auto; }
-        h1 { text-align:center; margin: 10px 0 20px; }
-
-        .dashboard {
-            background: var(--dark-green); color: white; border-radius: 16px;
-            padding: 20px; display: flex; justify-content: space-around;
-            margin-bottom: 20px;
-        }
+        h1 { text-align:center; margin: 20px 0; }
+        .dashboard { background: var(--dark-green); color: white; border-radius: 16px; padding: 20px; display: flex; justify-content: space-around; margin-bottom: 20px; }
         .dash-item { text-align: center; }
         .dash-label { font-size: 13px; opacity: 0.9; }
-        .dash-value { font-size: 26px; font-weight: bold; margin-top: 4px; }
-
-        .section {
-            background: white; border-radius: 16px; padding: 18px;
-            margin-bottom: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-        }
-
+        .dash-value { font-size: 26px; font-weight: bold; }
+        .section { background: white; border-radius: 16px; padding: 18px; margin-bottom: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
         .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .cat-btn {
-            padding: 16px; border: none; border-radius: 12px;
-            color: white; font-weight: bold; font-size: 16px;
-        }
-
+        .cat-btn { padding: 16px; border: none; border-radius: 12px; color: white; font-weight: bold; font-size: 16px; }
         input[type="text"] { width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; }
         button { padding: 14px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-
-        .record-item {
-            background: white; padding: 16px; border-radius: 12px;
-            margin-bottom: 12px; display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .modal {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.7);
-            align-items: center; justify-content: center; z-index: 1000;
-        }
-        .modal-content {
-            background: white; padding: 24px; border-radius: 16px;
-            width: 92%; max-width: 420px;
-        }
+        .record-item { background: white; padding: 16px; border-radius: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; padding: 24px; border-radius: 16px; width: 92%; max-width: 420px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌱 LifeSync 智慧生活筆記</h1>
-
-        <!-- 儀表板 -->
+        
         <div class="dashboard">
             <div class="dash-item"><div class="dash-label">今日熱量</div><div class="dash-value" id="total-calories">0</div></div>
             <div class="dash-item"><div class="dash-label">今日支出</div><div class="dash-value" id="total-expenses">0</div></div>
@@ -73,7 +41,6 @@
             <button onclick="exportToExcel()" style="background:#10b981; color:white;">📊 下載 Excel</button>
         </div>
 
-        <!-- 快捷按鈕 -->
         <div class="section">
             <div class="cat-grid">
                 <button class="cat-btn" style="background:#f57c00" onclick="quickInput('🍔 吃了')">吃</button>
@@ -83,19 +50,13 @@
             </div>
         </div>
 
-        <!-- AI 輸入 -->
         <div class="section">
             <input type="text" id="input-text" placeholder="今天吃了什麼？花了多少錢？">
             <button onclick="analyzeText()" style="background:#4f46e5; color:white; width:100%; margin-top:12px;">🤖 AI 解析</button>
             <div id="loading" style="display:none; text-align:center; margin-top:10px; color:#666;">AI 思考中...</div>
         </div>
 
-        <!-- 圖表 -->
-        <div class="section">
-            <canvas id="expenseChart" height="160"></canvas>
-        </div>
-
-        <!-- 記錄列表 -->
+        <div class="section"><canvas id="expenseChart" height="160"></canvas></div>
         <div id="records-list"></div>
     </div>
 
@@ -103,10 +64,10 @@
     <div id="edit-modal" class="modal">
         <div class="modal-content">
             <h3>編輯記錄</h3>
-            <input type="text" id="edit-text" style="width:100%; margin:8px 0;" placeholder="描述">
-            <input type="text" id="edit-amount" style="width:100%; margin:8px 0;" placeholder="金額">
-            <input type="text" id="edit-calories" style="width:100%; margin:8px 0;" placeholder="熱量">
-            <select id="edit-category" style="width:100%; padding:12px; margin:8px 0;">
+            <input type="text" id="edit-text" style="width:100%;margin:8px 0;" placeholder="描述">
+            <input type="text" id="edit-amount" style="width:100%;margin:8px 0;" placeholder="金額">
+            <input type="text" id="edit-calories" style="width:100%;margin:8px 0;" placeholder="熱量">
+            <select id="edit-category" style="width:100%;padding:12px;margin:8px 0;">
                 <option value="食物">食物</option>
                 <option value="消費">消費</option>
                 <option value="交通">交通</option>
@@ -114,7 +75,7 @@
                 <option value="運動">運動</option>
                 <option value="其他">其他</option>
             </select>
-            <div style="margin-top:20px; text-align:right;">
+            <div style="margin-top:20px;text-align:right;">
                 <button onclick="closeModal()" style="background:#9ca3af;color:white;">取消</button>
                 <button onclick="saveEdit()" style="background:#10b981;color:white;margin-left:10px;">儲存</button>
             </div>
@@ -122,13 +83,11 @@
     </div>
 
     <script>
-        // ================== 你的新網址已填入 ==================
+        // ================== 最新網址 ==================
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxRiNuRZWA_rr-lOJItFQVSqu-RzD4znsGkBfw8qJsV9kBcsGVJfp8QAWc16l-E1roz/exec";
 
-        let recordsData = [];
-        let totalCalories = 0, totalExpenses = 0, foodExpenses = 0;
-        let currentEditId = null;
-        let chartInstance = null;
+        let recordsData = [], totalCalories = 0, totalExpenses = 0, foodExpenses = 0;
+        let currentEditId = null, chartInstance = null;
 
         function quickInput(prefix) {
             const input = document.getElementById('input-text');
@@ -140,7 +99,6 @@
             const inputEl = document.getElementById('input-text');
             const loading = document.getElementById('loading');
             const text = inputEl.value.trim();
-
             if (!text) return alert("請輸入內容！");
 
             inputEl.disabled = true;
@@ -159,11 +117,10 @@
                     addRecordToList(result.data);
                     inputEl.value = '';
                 } else {
-                    alert("AI 解析失敗：" + (result.message || "未知錯誤"));
+                    alert("AI 解析失敗： " + (result.message || "未知錯誤"));
                 }
             } catch (err) {
-                console.error(err);
-                alert("❌ 連線失敗\n請確認 Apps Script 已重新部署且金鑰正確");
+                alert("❌ 連線失敗\n\n請確認：\n1. 部署時「誰可以存取」設為「任何人」\n2. 已重新部署\n3. Gemini API Key 正確");
             } finally {
                 inputEl.disabled = false;
                 loading.style.display = 'none';
@@ -198,8 +155,7 @@
             document.getElementById('records-list').prepend(div);
         }
 
-        // 其他函數（editRecord, saveEdit, toggleSync, updateDashboard, updateChart, exportToExcel）維持不變
-        function editRecord(id) { /* ... */ 
+        function editRecord(id) {
             currentEditId = id;
             const record = recordsData.find(r => r.id === id);
             if (!record) return;
@@ -227,7 +183,7 @@
             document.getElementById('edit-modal').style.display = 'none';
         }
 
-        async function toggleSync(id, checkbox) { /* ... */ 
+        async function toggleSync(id, checkbox) {
             const record = recordsData.find(r => r.id === id);
             if (!record || record.synced) return;
             try {
@@ -245,7 +201,7 @@
             } catch (e) {}
         }
 
-        function updateDashboard(record) { /* ... */ 
+        function updateDashboard(record) {
             if (record.amount) {
                 totalExpenses += parseFloat(record.amount) || 0;
                 document.getElementById('total-expenses').textContent = Math.round(totalExpenses);
@@ -260,7 +216,7 @@
             }
         }
 
-        function updateChart() { /* ... */ 
+        function updateChart() {
             const ctx = document.getElementById('expenseChart');
             if (chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
@@ -273,7 +229,7 @@
             });
         }
 
-        function exportToExcel() { /* ... */ 
+        function exportToExcel() {
             if (recordsData.length === 0) return alert("沒有記錄可匯出！");
             let csv = "日期,原始輸入,整理後,金額,分類,熱量\n";
             recordsData.forEach(r => {
@@ -286,7 +242,7 @@
             link.click();
         }
 
-        console.log("%cLifeSync 已啟動 🚀 新網址已更新", "color:#10b981;font-weight:bold");
+        console.log("%cLifeSync 已啟動 🚀", "color:#10b981;font-weight:bold");
     </script>
 </body>
 </html>
