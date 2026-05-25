@@ -12,10 +12,19 @@
     <style>
         :root {
             --primary-color: #4f46e5;
+            --fast-color: #10b981;
             --bg-color: #f3f6f9;
             --card-bg: #ffffff;
             --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --success-bg: #f0fdf4;
+            --success-border: #4ade80;
+            --danger-color: #ef4444;
             --dark-green: #2e7d32;
+            --btn-food: #f57c00;
+            --btn-expense: #e91e63;
+            --btn-work: #6d4c41;
+            --btn-transit: #2196f3;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -30,7 +39,7 @@
 
         h2.main-title { text-align: center; margin-bottom: 20px; font-size: 22px; color: #333; }
 
-        /* 儀表板樣式 */
+        /* 儀表板 */
         .green-dashboard {
             background: var(--dark-green); color: white; border-radius: 12px; padding: 20px 10px; 
             display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px;
@@ -41,10 +50,26 @@
         .dash-value { font-size: 20px; font-weight: bold; }
         .dash-divider { width: 1px; background: rgba(255,255,255,0.3); margin: 0 5px; }
 
-        /* 輸入區樣式 */
+        /* 分類按鈕 (你原本的設計) */
+        .category-box {
+            background: var(--card-bg); border-radius: 16px; padding: 20px; margin-bottom: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .cat-btn {
+            color: white; border: none; padding: 16px; border-radius: 12px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .cat-btn:active { transform: scale(0.95); }
+        .cat-food { background: var(--btn-food); }
+        .cat-expense { background: var(--btn-expense); }
+        .cat-work { background: var(--btn-work); }
+        .cat-transit { background: var(--btn-transit); }
+
+        /* 輸入區 */
         .input-section {
             background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         input[type="text"] {
             width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px;
@@ -60,7 +85,7 @@
         
         #loading-text { text-align: center; color: #ef4444; font-size: 14px; margin-top: 10px; display: none; font-weight: bold; }
 
-        /* 紀錄清單樣式 */
+        /* 紀錄清單 */
         .record-item {
             display: flex; align-items: center; background: white; padding: 12px;
             border-radius: 8px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -98,9 +123,18 @@
         </div>
     </div>
 
+    <div class="category-box">
+        <div class="cat-grid">
+            <button class="cat-btn cat-food" onclick="addManualRecord('食野')">🍔 食野</button>
+            <button class="cat-btn cat-expense" onclick="addManualRecord('洗費')">🛍️ 洗費</button>
+            <button class="cat-btn cat-work" onclick="addManualRecord('工作/運動')">💼 工作/運動</button>
+            <button class="cat-btn cat-transit" onclick="addManualRecord('交通')">🚌 交通</button>
+        </div>
+    </div>
+
     <div class="input-section">
-        <input type="text" id="note-input" placeholder="例如：早餐飲咗杯奶茶 25蚊">
-        <button id="submit-btn" class="btn-primary" onclick="processNoteWithAI()">✨ AI 分析並加入清單</button>
+        <input type="text" id="note-input" placeholder="直接輸入金額再撳上面按鈕，或輸入完整句子交畀AI...">
+        <button id="submit-btn" class="btn-primary" onclick="processNoteWithAI()">✨ AI 智能分析</button>
         <div id="loading-text">⚡ AI 正在分析熱量與數據...</div>
     </div>
 
@@ -108,7 +142,7 @@
 </div>
 
 <script>
-    // 🔴 關鍵步驟：請把你在 Apps Script 重新部署後獲得的「網頁應用程式網址」貼在引號內！
+    // 🔴 緊記填入你最新部署嘅 Apps Script 網址！
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyuBfNPh_ZQFaT52AK0NaaHDJJxeRU30vHOgudQQX005620ZwVo7Ls4R3qJog9M7es/exec"; 
 
     let recordsData = [];
@@ -116,25 +150,43 @@
     let foodExpenses = 0;
     let totalCalories = 0;
 
+    // --- 復原嘅手動輸入功能 ---
+    function addManualRecord(category) {
+        const inputEl = document.getElementById('note-input');
+        const text = inputEl.value.trim();
+        
+        if (!text) {
+            alert('請先喺下面輸入框打字（例如輸入金額或名稱），再撳分類掣！');
+            return;
+        }
+
+        // 自動嘗試喺輸入內容入面搵數字做金額
+        const match = text.match(/\d+/);
+        const amount = match ? match[0] : '';
+        const title = text.replace(amount, '').trim() || category;
+
+        addRecordToList({
+            text: title,
+            originalText: text,
+            amount: amount,
+            category: category,
+            calories: ''
+        });
+        
+        inputEl.value = ''; // 清空輸入框
+    }
+
+    // --- AI 分析功能 ---
     async function processNoteWithAI() {
         const inputEl = document.getElementById('note-input');
         const submitBtn = document.getElementById('submit-btn');
         const loadingText = document.getElementById('loading-text');
         const text = inputEl.value.trim();
         
-        if (!text) {
-            alert('請先輸入內容！');
-            return;
-        }
+        if (!text) { alert('請先輸入內容！'); return; }
+        if (WEB_APP_URL.includes("請貼上")) { alert('請先填入 WEB_APP_URL 才能連線到後端！'); return; }
 
-        if (WEB_APP_URL.includes("請貼上")) {
-            alert('系統提示：請先在程式碼中填入你的 WEB_APP_URL 才能連線到後端！');
-            return;
-        }
-
-        inputEl.disabled = true; 
-        submitBtn.disabled = true; 
-        loadingText.style.display = 'block';
+        inputEl.disabled = true; submitBtn.disabled = true; loadingText.style.display = 'block';
 
         try {
             const response = await fetch(WEB_APP_URL, {
@@ -144,7 +196,6 @@
             const result = await response.json();
             
             if (result.success) {
-                // 將原始輸入也保存下來，方便後續對照
                 result.data.originalText = text;
                 addRecordToList(result.data);
                 inputEl.value = ''; 
@@ -153,14 +204,12 @@
             }
         } catch (error) {
             alert('連線失敗，請檢查網路或 Apps Script 網址是否正確。');
-            console.error(error);
         } finally {
-            inputEl.disabled = false; 
-            submitBtn.disabled = false; 
-            loadingText.style.display = 'none';
+            inputEl.disabled = false; submitBtn.disabled = false; loadingText.style.display = 'none';
         }
     }
 
+    // --- 列表渲染與同步功能 ---
     function addRecordToList(data) {
         const listContainer = document.getElementById('records-list');
         const recordId = 'rec_' + Date.now();
@@ -174,9 +223,9 @@
         const calorieText = data.calories ? `${data.calories} kcal` : '';
 
         itemDiv.innerHTML = `
-            <input type="checkbox" onchange="toggleSync('${recordId}', this)" title="打勾以同步至 Google Sheets">
+            <input type="checkbox" onchange="toggleSync('${recordId}', this)">
             <div class="record-info">
-                <div class="record-text">${data.originalText}</div>
+                <div class="record-text">${data.originalText || data.text}</div>
                 <div class="record-meta">
                     <span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">${data.category || '一般'}</span>
                     ${amountText ? `<span style="color:#0f766e;">💰 ${amountText}</span>` : ''}
@@ -200,7 +249,7 @@
         const record = recordsData.find(r => r.id === id);
         
         if (checkboxEl.checked && !record.synced) {
-            statusEl.textContent = '同步中...';
+            statusEl.textContent = '傳送中';
             statusEl.className = 'record-status status-syncing';
             checkboxEl.disabled = true; 
             
@@ -217,14 +266,13 @@
                     record.synced = true;
                     updateDashboard(record);
                 } else {
-                    throw new Error("儲存失敗");
+                    throw new Error();
                 }
             } catch (error) {
-                statusEl.textContent = '同步失敗';
+                statusEl.textContent = '失敗';
                 statusEl.className = 'record-status status-pending';
                 statusEl.style.color = '#ef4444';
-                checkboxEl.checked = false; 
-                checkboxEl.disabled = false;
+                checkboxEl.checked = false; checkboxEl.disabled = false;
             }
         }
     }
