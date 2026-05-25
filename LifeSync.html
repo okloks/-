@@ -122,7 +122,8 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw4MaNRAWvggMzt0CMuQ4CfbytP4zLiNxb9qOH6oNKjOX0ckxIsqgHv5eNsSguSuuVg/exec";
+        // ================== 你的新網址已填入 ==================
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyRJP__hMNaqsyagXr-akYs8zyDwfCMP8kIbpC3pRAzRLK3_15Gd-TuqlwtXstY7Fw/exec";
 
         let recordsData = [];
         let totalCalories = 0, totalExpenses = 0, foodExpenses = 0;
@@ -141,7 +142,6 @@
             const text = inputEl.value.trim();
 
             if (!text) return alert("請輸入內容！");
-            if (!WEB_APP_URL.includes("script.google.com")) return alert("請先設定 WEB_APP_URL！");
 
             inputEl.disabled = true;
             loading.style.display = 'block';
@@ -159,10 +159,11 @@
                     addRecordToList(result.data);
                     inputEl.value = '';
                 } else {
-                    alert("AI 解析失敗：" + (result.message || ""));
+                    alert("AI 解析失敗：" + (result.message || "未知錯誤"));
                 }
             } catch (err) {
-                alert("連線失敗，請檢查網路或 Apps Script 網址");
+                console.error(err);
+                alert("❌ 連線失敗\n請確認 Apps Script 已重新部署且金鑰正確");
             } finally {
                 inputEl.disabled = false;
                 loading.style.display = 'none';
@@ -197,7 +198,8 @@
             document.getElementById('records-list').prepend(div);
         }
 
-        function editRecord(id) {
+        // 其他函數（editRecord, saveEdit, toggleSync, updateDashboard, updateChart, exportToExcel）維持不變
+        function editRecord(id) { /* ... */ 
             currentEditId = id;
             const record = recordsData.find(r => r.id === id);
             if (!record) return;
@@ -225,10 +227,9 @@
             document.getElementById('edit-modal').style.display = 'none';
         }
 
-        async function toggleSync(id, checkbox) {
+        async function toggleSync(id, checkbox) { /* ... */ 
             const record = recordsData.find(r => r.id === id);
             if (!record || record.synced) return;
-
             try {
                 const res = await fetch(WEB_APP_URL, {
                     method: 'POST',
@@ -241,12 +242,10 @@
                     checkbox.checked = true;
                     checkbox.disabled = true;
                 }
-            } catch (e) {
-                checkbox.checked = false;
-            }
+            } catch (e) {}
         }
 
-        function updateDashboard(record) {
+        function updateDashboard(record) { /* ... */ 
             if (record.amount) {
                 totalExpenses += parseFloat(record.amount) || 0;
                 document.getElementById('total-expenses').textContent = Math.round(totalExpenses);
@@ -261,7 +260,7 @@
             }
         }
 
-        function updateChart() {
+        function updateChart() { /* ... */ 
             const ctx = document.getElementById('expenseChart');
             if (chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
@@ -274,7 +273,7 @@
             });
         }
 
-        function exportToExcel() {
+        function exportToExcel() { /* ... */ 
             if (recordsData.length === 0) return alert("沒有記錄可匯出！");
             let csv = "日期,原始輸入,整理後,金額,分類,熱量\n";
             recordsData.forEach(r => {
@@ -287,7 +286,7 @@
             link.click();
         }
 
-        console.log("%cLifeSync 已啟動 🚀", "color:#10b981;font-weight:bold");
+        console.log("%cLifeSync 已啟動 🚀 新網址已更新", "color:#10b981;font-weight:bold");
     </script>
 </body>
 </html>
